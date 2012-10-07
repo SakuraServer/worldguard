@@ -689,7 +689,7 @@ public class WorldGuardEntityListener implements Listener {
 
             if (wcfg.useRegions) {
                 if (!plugin.getGlobalRegionManager().canBuild(player, painting.getLocation())) {
-                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                    player.sendMessage(ChatColor.DARK_RED + "このエリアのブロックを破壊する権限がありません！");
                     event.setCancelled(true);
                     return;
                 }
@@ -737,7 +737,7 @@ public class WorldGuardEntityListener implements Listener {
 
         if (wcfg.useRegions) {
             if (!plugin.getGlobalRegionManager().canBuild(player, placedOn.getLocation())) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                player.sendMessage(ChatColor.DARK_RED + "このエリアでブロックを設置する権限がありません！");
                 event.setCancelled(true);
                 return;
             }
@@ -875,7 +875,7 @@ public class WorldGuardEntityListener implements Listener {
         final DisallowedPVPEvent disallowedPVPEvent = new DisallowedPVPEvent(attackingPlayer, defendingPlayer, event);
         plugin.getServer().getPluginManager().callEvent(disallowedPVPEvent);
         if (!disallowedPVPEvent.isCancelled()) {
-            attackingPlayer.sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
+            attackingPlayer.sendMessage(ChatColor.DARK_RED + "ここはPvP無効エリアです！");
             event.setCancelled(true);
         }
     }

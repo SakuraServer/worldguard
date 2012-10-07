@@ -114,7 +114,7 @@ public class WorldGuardBlockListener implements Listener {
         // handle them a bit separately
         if (blockDamaged.getTypeId() == BlockID.CAKE_BLOCK) {
             if (!plugin.getGlobalRegionManager().canBuild(player, blockDamaged)) {
-                player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
+                player.sendMessage(ChatColor.DARK_RED + "あなたはこのお茶会に招待されていません！");
                 event.setCancelled(true);
                 return;
             }
@@ -141,7 +141,7 @@ public class WorldGuardBlockListener implements Listener {
 
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())
          || !plugin.getGlobalRegionManager().canConstruct(player, event.getBlock())) {
-            player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+            player.sendMessage(ChatColor.DARK_RED + "このエリアのブロックを破壊する権限がありません！");
             event.setCancelled(true);
             return;
         }
@@ -165,7 +165,7 @@ public class WorldGuardBlockListener implements Listener {
         }
 
         if (wcfg.isChestProtected(event.getBlock(), player)) {
-            player.sendMessage(ChatColor.DARK_RED + "The chest is protected.");
+            player.sendMessage(ChatColor.DARK_RED + "このチェストは保護されています");
             event.setCancelled(true);
             return;
         }
@@ -485,7 +485,7 @@ public class WorldGuardBlockListener implements Listener {
             final Location location = blockPlaced.getLocation();
             if (!plugin.getGlobalRegionManager().canBuild(player, location)
              || !plugin.getGlobalRegionManager().canConstruct(player, location)) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                player.sendMessage(ChatColor.DARK_RED + "このエリアでブロックを設置する権限がありません！");
                 event.setCancelled(true);
                 return;
             }
@@ -502,7 +502,7 @@ public class WorldGuardBlockListener implements Listener {
 
         if (wcfg.signChestProtection && wcfg.getChestProtection().isChest(blockPlaced.getTypeId())) {
             if (wcfg.isAdjacentChestProtected(event.getBlock(), player)) {
-                player.sendMessage(ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
+                player.sendMessage(ChatColor.DARK_RED + "この場所にチェストを設置する権限がありません！");
                 event.setCancelled(true);
                 return;
             }
@@ -619,7 +619,7 @@ public class WorldGuardBlockListener implements Listener {
         }
 
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())) {
-            player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+            player.sendMessage(ChatColor.DARK_RED + "このエリアで看板を設置する権限がありません！");
             event.setCancelled(true);
             return;
         }

@@ -65,7 +65,7 @@ public class WorldGuardVehicleListener implements Listener {
             if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                     && !set.canBuild(localPlayer)
                     && !set.allows(DefaultFlag.DESTROY_VEHICLE, localPlayer)) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission to destroy vehicles here.");
+                player.sendMessage(ChatColor.DARK_RED + "このエリアの乗り物を破壊する権限がありません！");
                 event.setCancelled(true);
                 return;
             }
@@ -112,7 +112,7 @@ public class WorldGuardVehicleListener implements Listener {
 
                 boolean exitAllowed = set.allows(DefaultFlag.EXIT, localPlayer);
                 if (!hasBypass && exitAllowed && !state.lastExitAllowed) {
-                    player.sendMessage(ChatColor.DARK_RED + "You are not permitted to leave this area.");
+                    player.sendMessage(ChatColor.DARK_RED + "このエリアから出る権限がありません！");
 
                     vehicle.setVelocity(new org.bukkit.util.Vector(0,0,0));
                     vehicle.teleport(event.getFrom());
