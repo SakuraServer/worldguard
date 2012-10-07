@@ -44,22 +44,22 @@ public class RegionMemberCommands {
     public RegionMemberCommands(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
-    
+
     @Command(aliases = {"addmember", "addmember"}, usage = "<id> <members...>",
             desc = "Add a member to a region", min = 2)
     public void addMember(CommandContext args, CommandSender sender) throws CommandException {
-        
+
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        
+
         String id = args.getString(0);
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
-            throw new CommandException("Could not find a region by that ID.");
+            throw new CommandException("指定された名前の保護エリアが見つかりません");
         }
 
         id = region.getId();
@@ -75,31 +75,31 @@ public class RegionMemberCommands {
         RegionDBUtil.addToDomain(region.getMembers(), args.getPaddedSlice(2, 0), 0);
 
         sender.sendMessage(ChatColor.YELLOW
-                + "Region '" + id + "' updated.");
-        
+                + "保護エリア '" + id + "' を更新しました");
+
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Failed to write regions: "
+            throw new CommandException("領域の更新に失敗しました: "
                     + e.getMessage());
         }
     }
-    
+
     @Command(aliases = {"addowner", "addowner"}, usage = "<id> <owners...>",
             desc = "Add an owner to a region", min = 2)
     public void addOwner(CommandContext args, CommandSender sender) throws CommandException {
-        
+
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        
+
         String id = args.getString(0);
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
-            throw new CommandException("Could not find a region by that ID.");
+            throw new CommandException("指定された名前の保護エリアが見つかりません");
         }
 
         id = region.getId();
@@ -111,7 +111,7 @@ public class RegionMemberCommands {
                 int maxRegionCount = plugin.getGlobalStateManager().get(world).getMaxRegionCount(player);
                 if (maxRegionCount >= 0 && mgr.getRegionCountOfPlayer(localPlayer)
                         >= maxRegionCount) {
-                    throw new CommandException("You already own the maximum allowed amount of regions.");
+                    throw new CommandException("あなたは既に所有数限度の保護エリアを持っています");
                 }
             }
             plugin.checkPermission(sender, "worldguard.region.addowner.unclaimed." + id.toLowerCase());
@@ -128,31 +128,31 @@ public class RegionMemberCommands {
         RegionDBUtil.addToDomain(region.getOwners(), args.getPaddedSlice(2, 0), 0);
 
         sender.sendMessage(ChatColor.YELLOW
-                + "Region '" + id + "' updated.");
-        
+                + "保護エリア '" + id + "' を更新しました");
+
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Failed to write regions: "
+            throw new CommandException("領域の更新に失敗しました: "
                     + e.getMessage());
         }
     }
-    
+
     @Command(aliases = {"removemember", "remmember", "removemem", "remmem"}, usage = "<id> <owners...>",
             desc = "Remove an owner to a region", min = 2)
     public void removeMember(CommandContext args, CommandSender sender) throws CommandException {
-        
+
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        
+
         String id = args.getString(0);
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
-            throw new CommandException("Could not find a region by that ID.");
+            throw new CommandException("指定された名前の保護エリアが見つかりません");
         }
 
         id = region.getId();
@@ -168,32 +168,32 @@ public class RegionMemberCommands {
         RegionDBUtil.removeFromDomain(region.getMembers(), args.getPaddedSlice(2, 0), 0);
 
         sender.sendMessage(ChatColor.YELLOW
-                + "Region '" + id + "' updated.");
-        
+                + "保護エリア '" + id + "' を更新しました");
+
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Failed to write regions: "
+            throw new CommandException("領域の更新に失敗しました: "
                     + e.getMessage());
         }
     }
-    
+
     @Command(aliases = {"removeowner", "remowner"}, usage = "<id> <owners...>",
             desc = "Remove an owner to a region", min = 2)
     public void removeOwner(CommandContext args,
             CommandSender sender) throws CommandException {
-        
+
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        
+
         String id = args.getString(0);
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
-            throw new CommandException("Could not find a region by that ID.");
+            throw new CommandException("指定された名前の保護エリアが見つかりません");
         }
 
         id = region.getId();
@@ -209,12 +209,12 @@ public class RegionMemberCommands {
         RegionDBUtil.removeFromDomain(region.getOwners(), args.getPaddedSlice(2, 0), 0);
 
         sender.sendMessage(ChatColor.YELLOW
-                + "Region '" + id + "' updated.");
-        
+                + "保護エリア '" + id + "' を更新しました");
+
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Failed to write regions: "
+            throw new CommandException("領域の更新に失敗しました: "
                     + e.getMessage());
         }
     }
