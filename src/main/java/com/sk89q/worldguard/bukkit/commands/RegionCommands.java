@@ -494,7 +494,7 @@ public class RegionCommands {
                 continue;
             }
 
-            if (s.length() > 0) {
+            if (hasFlags) {
                 s.append(", ");
             }
 
