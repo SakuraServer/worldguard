@@ -76,7 +76,7 @@
     <dependency>
       <groupId>org.khelekore</groupId>
       <artifactId>prtree</artifactId>
-      <version>1.4</version>
+      <version>1.5.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -92,10 +92,16 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
+  <distributionManagement>
+    <site>
+      <id>sk89q-docs-upload</id>
+      <url>ftp://sk89q-maven-deploy/worldguard/</url>
+    </site>
+  </distributionManagement>
   <build>
     <defaultGoal>install</defaultGoal>
     <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
@@ -168,6 +174,7 @@
               <artifactSet>
                 <includes>
                   <include>net.sf.opencsv:opencsv</include>
+                  <include>org.khelekore:prtree</include>
                 </includes>
               </artifactSet>
             </configuration>
