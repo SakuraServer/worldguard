@@ -94,7 +94,7 @@ public class WorldGuardPaintingListener implements Listener {
 
             if (wcfg.useRegions) {
                 if (!plugin.getGlobalRegionManager().canBuild(player, painting.getLocation())) {
-                    player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                    player.sendMessage(ChatColor.DARK_RED + "このエリアのブロックを破壊する権限がありません");
                     event.setCancelled(true);
                     return;
                 }
@@ -140,7 +140,7 @@ public class WorldGuardPaintingListener implements Listener {
 
         if (wcfg.useRegions) {
             if (!plugin.getGlobalRegionManager().canBuild(player, placedOn.getLocation())) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                player.sendMessage(ChatColor.DARK_RED + "このエリアにブロックを設置する権限がありません");
                 event.setCancelled(true);
                 return;
             }
