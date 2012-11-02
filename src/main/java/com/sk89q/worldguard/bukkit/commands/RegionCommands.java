@@ -52,6 +52,8 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
+import com.sk89q.worldguard.protection.flags.RegionGroup;
+import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -488,7 +490,7 @@ public class RegionCommands {
         boolean hasFlags = false;
         final StringBuilder s = new StringBuilder(ChatColor.BLUE + "設定フラグ: ");
         for (Flag<?> flag : DefaultFlag.getFlags()) {
-            Object val = region.getFlag(flag);
+            Object val = region.getFlag(flag), group = null;
 
             if (val == null) {
                 continue;
@@ -498,7 +500,17 @@ public class RegionCommands {
                 s.append(", ");
             }
 
-            s.append(flag.getName() + ": " + String.valueOf(val));
+            RegionGroupFlag groupFlag = flag.getRegionGroupFlag();
+            if (groupFlag != null) {
+                group = region.getFlag(groupFlag);
+            }
+
+            if(group == null) {
+                s.append(flag.getName() + ": " + String.valueOf(val));
+            } else {
+                s.append(flag.getName() + " -g " + String.valueOf(group) + ": " + String.valueOf(val));
+            }
+
             hasFlags = true;
         }
         if (hasFlags) {
@@ -660,6 +672,7 @@ public class RegionCommands {
         String id = args.getString(0);
         String flagName = args.getString(1);
         String value = null;
+        RegionGroup groupValue = null;
 
         if (args.argsLength() >= 3) {
             value = args.getJoinedStrings(2);
@@ -752,35 +765,61 @@ public class RegionCommands {
 
         if (args.hasFlag('g')) {
             String group = args.getFlag('g');
-            if (foundFlag.getRegionGroupFlag() == null) {
+
+            RegionGroupFlag groupFlag = foundFlag.getRegionGroupFlag();
+            if (groupFlag == null) {
                 throw new CommandException("エリアフラグ '" + foundFlag.getName()
                         + "' はグループフラグを持っていません！");
             }
 
+            // Parse the [-g group] separately so entire command can abort if parsing
+            // the [value] part throws an error.
             try {
-                setFlag(region, foundFlag.getRegionGroupFlag(), sender, group);
+                groupValue = groupFlag.parseInput(plugin, sender, group);
+            } catch (InvalidFlagFormat e) {
+                throw new CommandException(e.getMessage());
+            }
+
+        }
+
+        if (value != null) {
+            // Set the flag if [value] was given even if [-g group] was given as well
+            try {
+                setFlag(region, foundFlag, sender, value);
             } catch (InvalidFlagFormat e) {
                 throw new CommandException(e.getMessage());
             }
 
             sender.sendMessage(ChatColor.YELLOW
                     + "エリアグループフラグ '" + foundFlag.getName() + "' を設定しました");
-        } else {
-            if (value != null) {
-                try {
-                    setFlag(region, foundFlag, sender, value);
-                } catch (InvalidFlagFormat e) {
-                    throw new CommandException(e.getMessage());
-                }
+        }
 
+        if (value == null && !args.hasFlag('g')) {
+            // Clear the flag only if neither [value] nor [-g group] was given
+            region.setFlag(foundFlag, null);
+
+            // Also clear the associated group flag if one exists
+            RegionGroupFlag groupFlag = foundFlag.getRegionGroupFlag();
+            if (groupFlag != null) {
+                region.setFlag(groupFlag, null);
+            }
+
+            sender.sendMessage(ChatColor.YELLOW
+                    + "Region flag '" + foundFlag.getName() + "' cleared.");
+        }
+
+        if (groupValue != null) {
+            RegionGroupFlag groupFlag = foundFlag.getRegionGroupFlag();
+
+            // If group set to the default, then clear the group flag
+            if (groupValue == groupFlag.getDefault()) {
+                region.setFlag(groupFlag, null);
+                sender.sendMessage(ChatColor.YELLOW
+                        + "エリアフラグ '" + foundFlag.getName() + "' の設定をリセットしました");
+            } else {
+                region.setFlag(groupFlag, groupValue);
                 sender.sendMessage(ChatColor.YELLOW
                         + "エリアフラグ '" + foundFlag.getName() + "' を設定しました");
-            } else {
-                // Clear the flag
-                region.setFlag(foundFlag, null);
-
-                sender.sendMessage(ChatColor.YELLOW
-                        + "エリアフラグ '" + foundFlag.getName() + "' を削除しました");
             }
         }
 

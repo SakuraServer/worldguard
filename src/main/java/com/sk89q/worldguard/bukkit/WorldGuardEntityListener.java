@@ -35,7 +35,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Skeleton;
@@ -64,16 +63,11 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PigZapEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
-import org.bukkit.event.painting.PaintingBreakByEntityEvent;
-import org.bukkit.event.painting.PaintingBreakEvent;
-import org.bukkit.event.painting.PaintingPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BlockID;
-import com.sk89q.worldedit.blocks.ItemID;
 import com.sk89q.worldguard.LocalPlayer;
-import com.sk89q.worldguard.blacklist.events.BlockBreakBlacklistEvent;
 import com.sk89q.worldguard.blacklist.events.ItemUseBlacklistEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
@@ -98,7 +92,7 @@ public class WorldGuardEntityListener implements Listener {
      */
     public WorldGuardEntityListener(WorldGuardPlugin plugin) {
         this.plugin = plugin;
-        
+
         try {
             fireballEntityType = EntityType.valueOf("LARGE_FIREBALL");
         } catch (IllegalArgumentException e) {
@@ -631,7 +625,7 @@ public class WorldGuardEntityListener implements Listener {
             event.setCancelled(true);
             return;
         }
-        
+
         if (event.getEntityType() == EntityType.WITHER) {
             if (wcfg.blockWitherExplosions) {
                 event.setCancelled(true);
@@ -725,88 +719,6 @@ public class WorldGuardEntityListener implements Listener {
 
         if (wcfg.disableCreeperPower) {
             event.setCancelled(true);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onPaintingBreak(PaintingBreakEvent breakEvent) {
-        if (!(breakEvent instanceof PaintingBreakByEntityEvent)) {
-            return;
-        }
-
-        PaintingBreakByEntityEvent event = (PaintingBreakByEntityEvent) breakEvent;
-        Painting painting = event.getPainting();
-        World world = painting.getWorld();
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
-
-        if (event.getRemover() instanceof Player) {
-            Player player = (Player) event.getRemover();
-
-
-            if (wcfg.getBlacklist() != null) {
-                if (!wcfg.getBlacklist().check(
-                        new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
-                                toVector(player.getLocation()), ItemID.PAINTING), false, false)) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-
-            if (wcfg.useRegions) {
-                if (!plugin.getGlobalRegionManager().canBuild(player, painting.getLocation())) {
-                    player.sendMessage(ChatColor.DARK_RED + "このエリアのブロックを破壊する権限がありません！");
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-        } else {
-            if (event.getRemover() instanceof Creeper) {
-                if (wcfg.blockCreeperBlockDamage || wcfg.blockCreeperExplosions) {
-                    event.setCancelled(true);
-                    return;
-                }
-                if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(DefaultFlag.CREEPER_EXPLOSION, painting.getLocation())) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-
-            if (wcfg.blockEntityPaintingDestroy) {
-                event.setCancelled(true);
-                return;
-            }
-            if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(DefaultFlag.ENTITY_PAINTING_DESTROY, painting.getLocation())) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onPaintingPlace(PaintingPlaceEvent event) {
-        Block placedOn = event.getBlock();
-        Player player = event.getPlayer();
-        World world = placedOn.getWorld();
-
-        ConfigurationManager cfg = plugin.getGlobalStateManager();
-        WorldConfiguration wcfg = cfg.get(world);
-
-        if (wcfg.getBlacklist() != null) {
-            if (!wcfg.getBlacklist().check(
-                    new ItemUseBlacklistEvent(plugin.wrapPlayer(player),
-                            toVector(player.getLocation()), ItemID.PAINTING), false, false)) {
-                event.setCancelled(true);
-                return;
-            }
-        }
-
-        if (wcfg.useRegions) {
-            if (!plugin.getGlobalRegionManager().canBuild(player, placedOn.getLocation())) {
-                player.sendMessage(ChatColor.DARK_RED + "このエリアでブロックを設置する権限がありません！");
-                event.setCancelled(true);
-                return;
-            }
         }
     }
 
