@@ -159,11 +159,11 @@ public class WorldGuardPaintingListener implements Listener {
 
         if (wcfg.useRegions && entity instanceof Painting) {
             if (!plugin.getGlobalRegionManager().canBuild(player, entity.getLocation())) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                player.sendMessage(ChatColor.DARK_RED + "このエリアのブロックを編集する権限がありません");
                 event.setCancelled(true);
                 return;
             }
-            
+
             if (entity instanceof Painting
                     && ((!plugin.getGlobalRegionManager().allows(
                             DefaultFlag.ENTITY_PAINTING_DESTROY, entity.getLocation())))) {

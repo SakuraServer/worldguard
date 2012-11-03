@@ -177,11 +177,11 @@ public class WorldGuardHangingListener implements Listener {
 
         if (wcfg.useRegions && (entity instanceof ItemFrame || entity instanceof Painting)) {
             if (!plugin.getGlobalRegionManager().canBuild(player, entity.getLocation())) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                player.sendMessage(ChatColor.DARK_RED + "このエリアのブロックを編集する権限がありません");
                 event.setCancelled(true);
                 return;
             }
-            
+
             if (entity instanceof ItemFrame
                     && ((!plugin.getGlobalRegionManager().allows(
                             DefaultFlag.ENTITY_ITEM_FRAME_DESTROY, entity.getLocation())))) {
