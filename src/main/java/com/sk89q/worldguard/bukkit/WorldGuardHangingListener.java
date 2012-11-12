@@ -35,6 +35,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.hanging.HangingBreakEvent.RemoveCause;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 
@@ -69,64 +70,73 @@ public class WorldGuardHangingListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onHangingingBreak(HangingBreakEvent breakEvent) {
-        if (!(breakEvent instanceof HangingBreakByEntityEvent)) {
-            return;
-        }
-
-        HangingBreakByEntityEvent event = (HangingBreakByEntityEvent) breakEvent;
+    public void onHangingingBreak(HangingBreakEvent event) {
         Hanging hanging = event.getEntity();
         World world = hanging.getWorld();
         ConfigurationManager cfg = plugin.getGlobalStateManager();
         WorldConfiguration wcfg = cfg.get(world);
 
-        if (event.getRemover() instanceof Player) {
-            Player player = (Player) event.getRemover();
+        if (event instanceof HangingBreakByEntityEvent) {
+            HangingBreakByEntityEvent entityEvent = (HangingBreakByEntityEvent) event;
+            Entity removerEntity = entityEvent.getRemover();
 
-            if (wcfg.getBlacklist() != null) {
-                if (hanging instanceof Painting
-                        && !wcfg.getBlacklist().check(
-                            new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
-                                    toVector(player.getLocation()), ItemID.PAINTING), false, false)) {
-                    event.setCancelled(true);
-                    return;
-                } else if (hanging instanceof ItemFrame
-                        && !wcfg.getBlacklist().check(
-                            new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
-                                    toVector(player.getLocation()), ItemID.ITEM_FRAME), false, false)) {
-                    event.setCancelled(true);
-                    return;
+            if (removerEntity instanceof Player) {
+                Player player = (Player) removerEntity;
+
+                if (wcfg.getBlacklist() != null) {
+                    if (hanging instanceof Painting
+                            && !wcfg.getBlacklist().check(
+                                new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
+                                        toVector(player.getLocation()), ItemID.PAINTING), false, false)) {
+                        event.setCancelled(true);
+                        return;
+                    } else if (hanging instanceof ItemFrame
+                            && !wcfg.getBlacklist().check(
+                                new BlockBreakBlacklistEvent(plugin.wrapPlayer(player),
+                                        toVector(player.getLocation()), ItemID.ITEM_FRAME), false, false)) {
+                        event.setCancelled(true);
+                        return;
+                    }
                 }
-            }
 
-            if (wcfg.useRegions) {
-                if (!plugin.getGlobalRegionManager().canBuild(player, hanging.getLocation())) {
-                    player.sendMessage(ChatColor.DARK_RED + "このエリアのブロックを破壊する権限がありません");
+                if (wcfg.useRegions) {
+                    if (!plugin.getGlobalRegionManager().canBuild(player, hanging.getLocation())) {
+                        player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            } else {
+                if (removerEntity instanceof Creeper) {
+                    if (wcfg.blockCreeperBlockDamage || wcfg.blockCreeperExplosions) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                    if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(DefaultFlag.CREEPER_EXPLOSION, hanging.getLocation())) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+
+                if (hanging instanceof Painting
+                        && (wcfg.blockEntityPaintingDestroy
+                        || (wcfg.useRegions
+                        && !plugin.getGlobalRegionManager().allows(DefaultFlag.ENTITY_PAINTING_DESTROY, hanging.getLocation())))) {
                     event.setCancelled(true);
-                    return;
+                } else if (hanging instanceof ItemFrame
+                        && (wcfg.blockEntityItemFrameDestroy
+                        || (wcfg.useRegions
+                        && !plugin.getGlobalRegionManager().allows(DefaultFlag.ENTITY_ITEM_FRAME_DESTROY, hanging.getLocation())))) {
+                    event.setCancelled(true);
                 }
             }
         } else {
-            if (event.getRemover() instanceof Creeper) {
-                if (wcfg.blockCreeperBlockDamage || wcfg.blockCreeperExplosions) {
-                    event.setCancelled(true);
-                    return;
-                }
-                if (wcfg.useRegions && !plugin.getGlobalRegionManager().allows(DefaultFlag.CREEPER_EXPLOSION, hanging.getLocation())) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-
-            if (hanging instanceof Painting
-                    && (wcfg.blockEntityPaintingDestroy
-                    || (wcfg.useRegions
-                    && !plugin.getGlobalRegionManager().allows(DefaultFlag.ENTITY_PAINTING_DESTROY, hanging.getLocation())))) {
+            // Explosions from mobs are not covered by HangingBreakByEntity
+            if (hanging instanceof Painting && wcfg.blockEntityPaintingDestroy
+                    && event.getCause() == RemoveCause.EXPLOSION) {
                 event.setCancelled(true);
-            } else if (hanging instanceof ItemFrame
-                    && (wcfg.blockEntityItemFrameDestroy
-                    || (wcfg.useRegions
-                    && !plugin.getGlobalRegionManager().allows(DefaultFlag.ENTITY_ITEM_FRAME_DESTROY, hanging.getLocation())))) {
+            } else if (hanging instanceof ItemFrame && wcfg.blockEntityItemFrameDestroy
+                    && event.getCause() == RemoveCause.EXPLOSION) {
                 event.setCancelled(true);
             }
         }

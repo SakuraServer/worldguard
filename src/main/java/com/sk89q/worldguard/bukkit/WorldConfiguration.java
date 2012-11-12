@@ -31,6 +31,7 @@ import com.sk89q.worldguard.chest.SignChestProtection;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -74,10 +75,13 @@ public class WorldConfiguration {
     public boolean simulateSponge;
     public int spongeRadius;
     public boolean disableExpDrops;
+    public Set<PotionEffectType> blockPotions;
+    public boolean blockPotionsAlways;
     public boolean pumpkinScuba;
     public boolean redstoneSponges;
     public boolean noPhysicsGravel;
     public boolean noPhysicsSand;
+    public boolean ropeLadders;
     public boolean allowPortalAnywhere;
     public Set<Integer> preventWaterDamage;
     public boolean blockLighter;
@@ -99,6 +103,7 @@ public class WorldConfiguration {
     public boolean blockEntityPaintingDestroy;
     public boolean blockEntityItemFrameDestroy;
     public boolean blockPluginSpawning;
+    public boolean blockGroundSlimes;
     public boolean disableContactDamage;
     public boolean disableFallDamage;
     public boolean disableLavaDamage;
@@ -143,6 +148,7 @@ public class WorldConfiguration {
     public boolean disableIceFormation;
     public boolean disableLeafDecay;
     public boolean disableGrassGrowth;
+    public boolean disableMyceliumSpread;
     public boolean disableEndermanGriefing;
     public boolean regionInvinciblityRemovesMobs;
     public boolean disableDeathMessages;
@@ -287,6 +293,18 @@ public class WorldConfiguration {
         disableExpDrops = getBoolean("protection.disable-xp-orb-drops", false);
         disableObsidianGenerators = getBoolean("protection.disable-obsidian-generators", false);
 
+        blockPotions = new HashSet<PotionEffectType>();
+        for (String potionName : getStringList("gameplay.block-potions", null)) {
+            PotionEffectType effect = PotionEffectType.getByName(potionName);
+
+            if (effect == null) {
+                plugin.getLogger().warning("Unknown potion effect type '" + potionName + "'");
+            } else {
+                blockPotions.add(effect);
+            }
+        }
+        blockPotionsAlways = getBoolean("gameplay.block-potions-overly-reliably", false);
+
         simulateSponge = getBoolean("simulation.sponge.enable", true);
         spongeRadius = Math.max(1, getInt("simulation.sponge.radius", 3)) - 1;
         redstoneSponges = getBoolean("simulation.sponge.redstone", false);
@@ -296,6 +314,7 @@ public class WorldConfiguration {
 
         noPhysicsGravel = getBoolean("physics.no-physics-gravel", false);
         noPhysicsSand = getBoolean("physics.no-physics-sand", false);
+        ropeLadders = getBoolean("physics.vine-like-rope-ladders", false);
         allowPortalAnywhere = getBoolean("physics.allow-portal-anywhere", false);
         preventWaterDamage = new HashSet<Integer>(getIntList("physics.disable-water-damage-blocks", null));
 
@@ -322,6 +341,7 @@ public class WorldConfiguration {
         blockEntityPaintingDestroy = getBoolean("mobs.block-painting-destroy", false);
         blockEntityItemFrameDestroy = getBoolean("mobs.block-item-frame-destroy", false);
         blockPluginSpawning = getBoolean("mobs.block-plugin-spawning", true);
+        blockGroundSlimes = getBoolean("mobs.block-above-ground-slimes", false);
 
         disableFallDamage = getBoolean("player-damage.disable-fall-damage", false);
         disableLavaDamage = getBoolean("player-damage.disable-lava-damage", false);
@@ -359,6 +379,7 @@ public class WorldConfiguration {
         disableIceFormation = getBoolean("dynamics.disable-ice-formation", false);
         disableLeafDecay = getBoolean("dynamics.disable-leaf-decay", false);
         disableGrassGrowth = getBoolean("dynamics.disable-grass-growth", false);
+        disableMyceliumSpread = getBoolean("dynamics.disable-mycelium-spread", false);
 
         useRegions = getBoolean("regions.enable", true);
         regionInvinciblityRemovesMobs = getBoolean("regions.invincibility-removes-mobs", false);
