@@ -411,7 +411,7 @@ public class WorldGuardPlayerListener implements Listener {
             if (item != null && item.getType() == Material.POTION && !BukkitUtil.isWaterPotion(item)) {
                 PotionEffect blockedEffect = null;
 
-                Potion potion = Potion.fromItemStack(item);
+                Potion potion = Potion.fromDamage(BukkitUtil.getPotionEffectBits(item));
                 for (PotionEffect effect : potion.getEffects()) {
                     if (wcfg.blockPotions.contains(effect.getType())) {
                         blockedEffect = effect;
@@ -482,6 +482,16 @@ public class WorldGuardPlayerListener implements Listener {
                         && !set.allows(DefaultFlag.USE, localPlayer)
                         && !set.canBuild(localPlayer)) {
                     player.sendMessage(ChatColor.DARK_RED + "このエリアで使用する権限がありません！");
+                    event.setUseInteractedBlock(Result.DENY);
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
+            if (type == BlockID.DRAGON_EGG) {
+                if (!plugin.getGlobalRegionManager().hasBypass(player, world)
+                        && !set.canBuild(localPlayer)) {
+                    player.sendMessage(ChatColor.DARK_RED + "You're not allowed to move dragon eggs here!");
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
                     return;
@@ -682,7 +692,8 @@ public class WorldGuardPlayerListener implements Listener {
                     || type == BlockID.WORKBENCH
                     || type == BlockID.BREWING_STAND
                     || type == BlockID.ENCHANTMENT_TABLE
-                    || type == BlockID.CAULDRON) {
+                    || type == BlockID.CAULDRON
+                    || type == BlockID.BEACON) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)
                         && !set.allows(DefaultFlag.USE, localPlayer)) {
