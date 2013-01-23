@@ -560,7 +560,7 @@ public class WorldGuardPlayerListener implements Listener {
             if (type == BlockID.DRAGON_EGG) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)) {
-                    player.sendMessage(ChatColor.DARK_RED + "You're not allowed to move dragon eggs here!");
+                    player.sendMessage(ChatColor.DARK_RED + "このエリアでドラゴンエッグを動かす権限がありません！");
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
                     return;
@@ -712,7 +712,7 @@ public class WorldGuardPlayerListener implements Listener {
                         cancel = true;
                     }
                     if (cancel) {
-                        player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                        player.sendMessage(ChatColor.DARK_RED + "このエリアで使う権限がありません！");
                         event.setCancelled(true);
                         return;
                     }
@@ -727,7 +727,7 @@ public class WorldGuardPlayerListener implements Listener {
                             && !set.canBuild(localPlayer)) {
                         event.setCancelled(true);
                         event.setUseItemInHand(Result.DENY);
-                        player.sendMessage(ChatColor.DARK_RED + "You're not allowed to use that here.");
+                        player.sendMessage(ChatColor.DARK_RED + "このエリアで使う権限がありません！");
                         return;
                     }
                 } else if (item.getData().getData() == 3) { // cocoa beans
@@ -737,7 +737,7 @@ public class WorldGuardPlayerListener implements Listener {
                         if (!(event.getBlockFace() == BlockFace.DOWN || event.getBlockFace() == BlockFace.UP)) {
                             event.setCancelled(true);
                             event.setUseItemInHand(Result.DENY);
-                            player.sendMessage(ChatColor.DARK_RED + "You're not allowed to plant that here.");
+                            player.sendMessage(ChatColor.DARK_RED + "このエリアで植える権限がありません！");
                             return;
                         }
                     }
@@ -757,7 +757,7 @@ public class WorldGuardPlayerListener implements Listener {
                             && !set.canBuild(localPlayer)) {
                         event.setUseItemInHand(Result.DENY);
                         event.setCancelled(true);
-                        player.sendMessage(ChatColor.DARK_RED + "You're not allowed to plant that here.");
+                        player.sendMessage(ChatColor.DARK_RED + "このエリアで植える権限がありません！");
                         return;
                     }
                 }
@@ -792,7 +792,7 @@ public class WorldGuardPlayerListener implements Listener {
             if (type == BlockID.DRAGON_EGG) {
                 if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                         && !set.canBuild(localPlayer)) {
-                    player.sendMessage(ChatColor.DARK_RED + "You're not allowed to move dragon eggs here!");
+                    player.sendMessage(ChatColor.DARK_RED + "このエリアでドラゴンエッグを動かす権限がありません！");
                     event.setUseInteractedBlock(Result.DENY);
                     event.setCancelled(true);
                     return;
@@ -1248,14 +1248,14 @@ public class WorldGuardPlayerListener implements Listener {
                 if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
                         && !(set.allows(DefaultFlag.ENTRY, localPlayer)
                                 && setFrom.allows(DefaultFlag.EXIT, localPlayer))) {
-                    event.getPlayer().sendMessage(ChatColor.DARK_RED + "You're not allowed to go there.");
+                    event.getPlayer().sendMessage(ChatColor.DARK_RED + "その地点に移動する権限がありません！");
                     event.setCancelled(true);
                     return;
                 }
                 if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
                         && !(set.allows(DefaultFlag.ENDERPEARL, localPlayer)
                                 && setFrom.allows(DefaultFlag.ENDERPEARL, localPlayer))) {
-                    event.getPlayer().sendMessage(ChatColor.DARK_RED + "You're not allowed to go there.");
+                    event.getPlayer().sendMessage(ChatColor.DARK_RED + "その地点に移動する権限がありません！");
                     event.setCancelled(true);
                     return;
                 }
