@@ -192,7 +192,19 @@ public class WorldGuardEntityListener implements Listener {
                 return;
             }
 
-            if (wcfg.disableExplosionDamage && type == DamageCause.BLOCK_EXPLOSION) {
+            if (type == DamageCause.BLOCK_EXPLOSION
+                    && (wcfg.disableExplosionDamage || wcfg.blockOtherExplosions
+                            || !plugin.getGlobalRegionManager().allows(DefaultFlag.OTHER_EXPLOSION, player.getLocation()))) {
+                event.setCancelled(true);
+                return;
+            }
+        } else {
+
+            // for whatever reason, plugin-caused explosions with a null entity count as block explosions and aren't
+            // handled anywhere else
+            if (type == DamageCause.BLOCK_EXPLOSION
+                    && (wcfg.blockOtherExplosions
+                            || !plugin.getGlobalRegionManager().allows(DefaultFlag.OTHER_EXPLOSION, defender.getLocation()))) {
                 event.setCancelled(true);
                 return;
             }
@@ -671,7 +683,6 @@ public class WorldGuardEntityListener implements Listener {
         } else {
             // unhandled entity
             if (wcfg.blockOtherExplosions) {
-                event.blockList().clear();
                 event.setCancelled(true);
                 return;
             }
@@ -679,7 +690,7 @@ public class WorldGuardEntityListener implements Listener {
                 RegionManager mgr = plugin.getGlobalRegionManager().get(world);
                 for (Block block : event.blockList()) {
                     if (!mgr.getApplicableRegions(toVector(block)).allows(DefaultFlag.OTHER_EXPLOSION)) {
-                        event.blockList().clear();
+                        event.setCancelled(true);
                         return;
                     }
                 }
